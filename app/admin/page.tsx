@@ -1,8 +1,14 @@
 'use client';
 
 import AddGameForm from '../components/AddGameForm';
+import {useEffect} from "react";
 
 const AdminPage: React.FC = () => {
+
+    useEffect(() => {
+        console.log(process.env)
+    }, [])
+
     return (
         <div className="container mx-auto p-4">
 
