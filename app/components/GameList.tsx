@@ -23,6 +23,7 @@ const GameList: React.FC = () => {
     useEffect(() => {
         fetchGames();
 
+
         const channel = supabase.channel('games-channel')
             .on(
                 'postgres_changes',
@@ -46,6 +47,9 @@ const GameList: React.FC = () => {
             const { error } = await supabase.from('games').delete().eq('id', id);
             if (error) {
                 console.error('Erreur lors de la suppression du jeu :', error);
+            } else {
+                console.log('Jeu supprimé avec succès');
+                await fetchGames();
             }
         }
     };
@@ -54,6 +58,7 @@ const GameList: React.FC = () => {
         <div className="space-y-4">
             {games.map((game) => (
                 <div key={game.id} className="border p-4 rounded shadow">
+                    <button onClick={() => console.log(game)}>log</button>
                     <h2 className="text-xl font-bold">{game.title}</h2>
                     <p>{game.description}</p>
                     <p><strong>Statut :</strong> {game.status}</p>
