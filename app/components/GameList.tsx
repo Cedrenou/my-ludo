@@ -22,28 +22,22 @@ const GameList: React.FC = () => {
 
     useEffect(() => {
         fetchGames();
-
-
         const channel = supabase.channel('games-channel')
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'games' },
-                (payload) => {
-                    console.log('Changement reçu :', payload);
-                    fetchGames(); // Recharge la liste à chaque changement
+                () => {
+                    fetchGames();
                 }
             )
             .subscribe();
-
         // Nettoyer le canal lors du démontage du composant
         return () => {
             supabase.removeChannel(channel);
         };
     }, []);
 
-    // Suppression d'un jeu
     const handleDelete = async (id: number) => {
-        if (window.confirm('Voulez-vous vraiment supprimer ce jeu ?')) {
             const { error } = await supabase.from('games').delete().eq('id', id);
             if (error) {
                 console.error('Erreur lors de la suppression du jeu :', error);
@@ -51,7 +45,6 @@ const GameList: React.FC = () => {
                 console.log('Jeu supprimé avec succès');
                 await fetchGames();
             }
-        }
     };
 
     return (
