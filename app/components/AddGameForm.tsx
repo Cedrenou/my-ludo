@@ -1,7 +1,7 @@
 // components/AddGameForm.tsx
 
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 interface IGameFormInputs {
     title: string;
