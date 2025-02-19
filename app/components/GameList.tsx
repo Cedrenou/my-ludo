@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import {useRouter} from "next/navigation";
 
 interface IGame {
     id: number;
@@ -10,6 +11,7 @@ interface IGame {
 
 const GameList: React.FC = () => {
     const [games, setGames] = useState<IGame[]>([]);
+    const router = useRouter();
 
     const fetchGames = async () => {
         const { data, error } = await supabase.from('games').select('*');
@@ -47,15 +49,19 @@ const GameList: React.FC = () => {
             }
     };
 
+    const handleEdit = (id: number) => {
+        router.push(`/games/${id}`);
+    }
+
     return (
-        <div className="space-y-4">
+        <div className="grid grid-cols-4 gap-4 space-y-4">
             {games.map((game) => (
                 <div key={game.id} className="border p-4 rounded shadow">
-                    <button onClick={() => console.log(game)}>log</button>
                     <h2 className="text-xl font-bold">{game.title}</h2>
                     <p>{game.description}</p>
                     <p><strong>Statut :</strong> {game.status}</p>
-                    <button onClick={() => handleDelete(game.id)} className="bg-red-500 text-white px-3 py-1 rounded mt-2">Supprimer</button>
+                    <button onClick={() => handleDelete(game.id)} className="bg-red-500 text-white px-3 py-1 rounded m-2">Supprimer</button>
+                    <button onClick={() => handleEdit(game.id)} className="bg-blue-400 text-white px-3 py-1 rounded m-2">Editer</button>
                 </div>
             ))}
         </div>
