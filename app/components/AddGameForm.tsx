@@ -13,9 +13,36 @@ const AddGameForm: React.FC = () => {
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<IGameFormInputs>();
 
     const onSubmit: SubmitHandler<IGameFormInputs> = async (data) => {
+        const imageFile =  (document.getElementById('image') as HTMLInputElement).files?.[0];
+
+        let imagePath = null
+        if (imageFile) {
+            const filePath = `games/${Date.now()}-${imageFile.name}`;
+            const {data: storageData, error: storageError} = await supabase
+                .storage
+                .from('games-images')
+                .upload(filePath, imageFile, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
+
+            if (storageError) {
+                console.error('Erreur lors de l’upload de l’image :', storageError);
+                return;
+            }
+            imagePath = storageData?.path;
+        }
+
+
         const { error } = await supabase
             .from('games')
-            .insert([{ title: data.title, description: data.description, status: data.status }]);
+            .insert([{
+                title: data.title,
+                description: data.description,
+                image: imagePath,
+                status: data.status
+            }]);
+
         if (error) {
             console.error('Erreur lors de l’ajout du jeu :', error);
         } else {
@@ -35,6 +62,10 @@ const AddGameForm: React.FC = () => {
                 <label htmlFor="description">Description :</label>
                 <textarea id="description" {...register("description", { required: "La description est requise" })} className="border p-2 rounded w-full" />
                 {errors.description && <p className="text-red-500">{errors.description.message}</p>}
+            </div>
+            <div>
+                <label htmlFor="image">Image du jeu :</label>
+                <input id="image" type="file" accept="image/*" className="border p-2 rounded w-full" />
             </div>
             <div>
                 <label htmlFor="status">Statut :</label>
